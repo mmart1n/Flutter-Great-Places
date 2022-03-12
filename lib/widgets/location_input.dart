@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:great_places_app/helpers/google_helper.dart';
+import 'package:great_places_app/screens/map_screen.dart';
 
 import '../helpers/location_helper.dart';
 
@@ -32,6 +34,21 @@ class _LocationInputState extends State<LocationInput> {
         );
       }
     });
+  }
+
+  Future<void> _selectOnMap() async {
+    final selectedLocation = await Navigator.of(context).push<LatLng>(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (ctx) => const MapScreen(
+          isSelecting: true,
+        ),
+      ),
+    );
+    if (selectedLocation == null) {
+      return;
+    }
+    // print(selectedLocation.latitude);
   }
 
   @override
@@ -77,7 +94,7 @@ class _LocationInputState extends State<LocationInput> {
                   Theme.of(context).colorScheme.primary,
                 ),
               ),
-              onPressed: () {},
+              onPressed: _selectOnMap,
             ),
           ],
         ),
