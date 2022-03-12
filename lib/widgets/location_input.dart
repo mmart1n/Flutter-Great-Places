@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:great_places_app/helpers/google_helper.dart';
+import 'package:great_places_app/models/place.dart';
 import 'package:great_places_app/screens/map_screen.dart';
 
 import '../helpers/location_helper.dart';
@@ -16,6 +17,7 @@ class LocationInput extends StatefulWidget {
 
 class _LocationInputState extends State<LocationInput> {
   String? _previewImageUrl;
+  PlaceLocation? _chosenLoc;
 
   Future<void> _getCurrentUserLocation() async {
     setState(() {
@@ -30,10 +32,14 @@ class _LocationInputState extends State<LocationInput> {
     setState(() {
       Navigator.of(context).pop();
       if (locData != null) {
+        _chosenLoc = PlaceLocation(
+            latitude: locData.latitude!, longitude: locData.longitude!);
+
         _previewImageUrl = GoogleHelper.generateLocationPreviewImage(
           latitude: locData.latitude!,
           longitude: locData.longitude!,
         );
+
         widget.onSelectPlace(locData.latitude, locData.longitude);
       }
     });
@@ -43,15 +49,25 @@ class _LocationInputState extends State<LocationInput> {
     final selectedLocation = await Navigator.of(context).push<LatLng>(
       MaterialPageRoute(
         fullscreenDialog: true,
-        builder: (ctx) => const MapScreen(
-          isSelecting: true,
-        ),
+        builder: (ctx) => _chosenLoc != null
+            ? MapScreen(
+                isSelecting: true,
+                initialLocation: _chosenLoc!,
+              )
+            : const MapScreen(
+                isSelecting: true,
+              ),
       ),
     );
     if (selectedLocation == null) {
       return;
     }
+
     setState(() {
+      _chosenLoc = PlaceLocation(
+          latitude: selectedLocation.latitude,
+          longitude: selectedLocation.longitude);
+
       _previewImageUrl = GoogleHelper.generateLocationPreviewImage(
         latitude: selectedLocation.latitude,
         longitude: selectedLocation.longitude,
