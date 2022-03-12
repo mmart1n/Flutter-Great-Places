@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:great_places_app/helpers/google_helper.dart';
 
 import '../helpers/location_helper.dart';
 
@@ -24,11 +25,13 @@ class _LocationInputState extends State<LocationInput> {
     final locData = await locHelper.getLocation(context);
     setState(() {
       Navigator.of(context).pop();
+      if (locData != null) {
+        _previewImageUrl = GoogleHelper.generateLocationPreviewImage(
+          latitude: locData.latitude!,
+          longitude: locData.longitude!,
+        );
+      }
     });
-    if (locData != null) {
-      print(locData.latitude);
-      print(locData.longitude);
-    }
   }
 
   @override
